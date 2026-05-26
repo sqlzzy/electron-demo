@@ -1,31 +1,76 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 
-function createWindow() {
-    const win = new BrowserWindow({
-        width: 900,
-        height: 700,
+let loginWindow = null;
+let mainWindow = null;
+
+function createLoginWindow() {
+    loginWindow = new BrowserWindow({
+        width: 400,
+        height: 500,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             nodeIntegration: false,
             contextIsolation: true,
         },
+        resizable: false,
+        title: 'Авторизация',
     });
 
-    if (process.env.NODE_ENV === 'development') {
-        win.loadURL('http://localhost:5173');
-        win.webContents.openDevTools();
-    } else {
-        win.loadFile(path.join(__dirname, 'dist', 'index.html'));
-    }
+    loginWindow.loadFile('login.html');
 }
 
-app.whenReady().then(createWindow);
+function createMainWindow() {
+    mainWindow = new BrowserWindow({
+        width: 1024,
+        height: 768,
+        webPreferences: {
+            preload: path.join(__dirname, 'preload.js'),
+            nodeIntegration: false,
+            contextIsolation: true,
+        },
+        title: 'Главное приложение',
+        show: false,
+    });
+
+    mainWindow.loadFile('main-window.html');
+    
+    mainWindow.once('ready-to-show', () => {
+        mainWindow.show();
+    });
+    
+    mainWindow.on('closed', () => {
+        mainWindow = null;
+    });
+}
+
+ipcMain.handle('auth:login', async (event, { username, password }) => {
+    const validUsername = 'admin';
+    const validPassword = '123';
+    
+    if (username === validUsername && password === validPassword) {
+        if (loginWindow) {
+            loginWindow.close();
+        }
+        createMainWindow();
+        return { success: true };
+    } else {
+        return { success: false, message: 'Неверное имя пользователя или пароль' };
+    }
+});
 
 app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') app.quit();
+    if (process.platform !== 'darwin') {
+        app.quit();
+    }
 });
 
 app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+    if (BrowserWindow.getAllWindows().length === 0) {
+        createLoginWindow();
+    }
+});
+
+app.whenReady().then(() => {
+    createLoginWindow();
 });

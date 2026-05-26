@@ -4,20 +4,12 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "electron": "NODE_ENV=development electron .",
-    "start": "npm run build && NODE_ENV=production electron ."
+    "start": "electron ."
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "electron": "^42.2.0",
-    "vue": "^3.5.34"
-  },
-  "devDependencies": {
-    "@vitejs/plugin-vue": "^6.0.7",
-    "vite": "^8.0.14"
+    "electron": "^42.2.0"
   }
 }
