@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Electron Demo</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body>
+    <div id="app">
+        <h1>🚀 Electron + Vue работает!</h1>
+        <p>Платформа: {{ platform }}</p>
+        <button @click="counter++">Нажато: {{ counter }}</button>
+    </div>
+
+    <script>
+        const { createApp, ref } = Vue;
+        
+        createApp({
+            setup() {
+                const counter = ref(0);
+                const platform = ref(window.electronAPI?.platform || 'unknown');
+                return { counter, platform };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
